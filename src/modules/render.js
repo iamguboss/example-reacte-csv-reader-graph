@@ -1,6 +1,7 @@
 import React, {
     Component
 } from 'react';
+import * as d3 from 'd3';
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
 
 export default class extends Component {
@@ -8,7 +9,7 @@ export default class extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            data: []
+            data: null
         };
 
     }
@@ -17,33 +18,14 @@ export default class extends Component {
         this.fetchCsv()
     }
 
-    fetchCsv = async () => {
-        let response = await fetch('mockdata.csv')
-        let text_response = await response.text()
-        let convert_data =  this.parseCsvToJson(text_response)
-        convert_data.shift()
-        this.setState({
-            data: convert_data
+    fetchCsv = () => {
+        d3.csv('mockdata.csv', (data) => {
+            return data
+        }).then((data) => {
+            this.setState({
+                data: data
+            })
         })
-    }
-
-    parseCsvToJson(csvData) {
-        const lines = csvData.split("\n");
-        const headers = lines[0].split(",");
-
-        let jsonData = [];
-
-        lines.map((line, row) => {
-            let obj = {};
-            const currentline = line.split(",");
-            headers.map((header, column) => {
-                obj[header] = currentline[column];
-            });
-
-            jsonData.push(obj);
-        });
-
-        return jsonData;
     }
 
     render() {
